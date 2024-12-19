@@ -1,5 +1,5 @@
 # PPID Spoofing
-## [![Typing SVG](https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=2000&pause=1000&width=435&lines=Welcome+to+PPID+Spoofing+Tutorial!!!;Learn+Process+Parent+ID+Spoofing+in+C++;Bypass+Detection+Mechanisms;For+Educational+Purposes+Only)](https://git.io/typing-svg)
+## [![Typing SVG](https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=2000&pause=1000&width=435&lines=Welcome+to+PPID+Spoofing+Malware+Technique!!!;Emplemanting+Process+Parent+ID+Spoofing+in+C++;Bypass+Detection+Mechanisms;For+Research+Purposes+Only)](https://git.io/typing-svg)
 
 ## Overview
 
