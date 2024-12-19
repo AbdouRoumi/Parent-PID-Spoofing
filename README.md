@@ -150,7 +150,7 @@ Contributions are welcome! If you have additional techniques or improvements to 
 
 ## Disclaimer
 
-This repository is for **educational purposes only**. The techniques demonstrated here aim to educate security professionals on understanding and defending against such tactics. **Misuse of this information is strictly prohibited** and not supported by the author.
+This repository is for **Research and educational purposes only**. The techniques demonstrated here aim to educate security professionals on understanding and defending against such tactics. **Misuse of this information is strictly prohibited** and not supported by the author.
 
 ---
 
