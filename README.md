@@ -5,6 +5,7 @@
 
 Welcome to the **PPID Spoofing** repository! This project demonstrates a technique used to manipulate the Process Parent ID (PPID) of newly created processes. By spoofing the PPID, malicious processes can blend in with legitimate processes, bypassing detection mechanisms employed by security solutions such as EDRs, AVs, and sandboxes.
 
+
 This repository serves as a practical guide and educational resource to learn how PPID spoofing works, along with sample code for implementation.
 
 **Disclaimer**: This code is intended for Research purposes only. Any malicious use is strictly prohibited.
